@@ -32,7 +32,7 @@ def Get3DSBBS(title, address):
 # 得到多玩可下载的3ds标题
 def Get3DSTitle(page):
     result   = {}
-    for i in range(51, page):
+    for i in range(1, page):
         url      = 'http://tvgdb.duowan.com/3ds?state=dl&search_state=dl&page=%d' % i
         response = urllib2.urlopen(url)
         html     = response.read()
@@ -54,7 +54,7 @@ def Get3DSTitle(page):
                 continue
     return result
 if __name__ == "__main__":
-    data = Get3DSTitle(86)
+    data = Get3DSTitle(4)
     fp.close()
     
 
