@@ -1,7 +1,24 @@
 (require 'request)
 (require 'json)
+(defun hello-world (items)
+  (switch-to-buffer-other-window "*test*")
+  (md-book-mode)
+  (setq buffer-read-only nil)
+  (erase-buffer)
+  (set (make-local-variable 'i) 0)
+  (while (< i (length items))
+	(set (make-local-variable 'book) (elt items i))
+	(insert (propertize (format "[%s]" (assoc-default 'title book)) 'face '(:foreground "SpringGreen")))
+	(insert ":")
+	(insert (propertize (format "<%s>\n" (assoc-default 'alt book)) 'face '(:foreground "DeepSkyBlue")))
+	(setq i (1+ i))
+	)
+  (setq buffer-read-only t)
+  )
+
+
 (defun search-book (title)
-  (interactive "s[TAG]: ")
+  (interactive "s[TITlE]:")
   (let (
 		(a (cons "q" title))
 		(b (cons "fields" "title,alt"))
@@ -14,30 +31,13 @@
 	 :parser 'json-read
 	 :success (function*
 			   (lambda (&key data &allow-other-keys)
-				 (setq books (assoc-default 'books data))
-				 (message "title is %s" books)
-				 (setq i 0)
-				 (while (< i (length books))
-				   (setq book (elt books i))
-				   (message "title is %s" (assoc-default 'title book))
-				   (message "url is %s" (assoc-default 'alt book))
-				   (setq i (1+ i))
-				   )
+				 ;;(message "%s" (assoc-default 'books data))
+				 (hello-world (assoc-default 'books data))
 				 ))
 	 )
 	)
   )
 
-
-(defun hello-world (name)
-  (switch-to-buffer-other-window "*test*")
-  (md-book-mode)
-  (setq buffer-read-only nil)
-  (erase-buffer)
-  (insert (format "hello %s\n" name))
-  (search-book name)
-  (setq buffer-read-only t)
-  )
 
 (defun next-book ()
   (interactive)
@@ -53,7 +53,11 @@
 
 (defun select-book ()
   (interactive)
-  (message "select %s" (thing-at-point 'line))
+  (let ((url (thing-at-point 'line)))
+	(delete-window)
+	(insert url)
+	)
+  ;;(switch-to-buffer-other-window (other-buffer (current-buffer) ))
   )
 
 
