@@ -17,7 +17,7 @@
   (setq buffer-read-only t)
   )
 
-(defun seartch-db-book (title)
+(defun search-db-book (title)
   (interactive "s[TITlE]:")
   (let (
 		(a (cons "q" title))
@@ -26,7 +26,7 @@
 	(message "%s" (list a b))
 	(request
 	 "https://api.douban.com/v2/book/search"
-	 :params (list a b c)
+	 :params (list a b)
 	 :parser 'json-read
 	 :success (function*
 			   (lambda (&key data &allow-other-keys)
