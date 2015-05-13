@@ -34,7 +34,7 @@ void draw() {
       float r = map(noise(xoff, yoff, s), 0, 1, 0, 255);
       noiseDetail(1);
       float g = map(noise(xoff, yoff, s), 0, 1, 0, 255);
-      noiseDetail(8);
+      noiseDetail(3);
       float b = map(noise(xoff, yoff, s), 0, 1, 0, 255);
       pixels[x+y*width] = color(r, g, b);
       yoff += 0.02;
