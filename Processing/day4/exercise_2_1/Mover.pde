@@ -30,16 +30,15 @@ class Mover {
     fill(127);
     ellipse(location.x,location.y,48,48);
   }
-  void checkEdges() {
 
+  void checkEdges() {
     if (location.x > width) {
       location.x = width;
-      velocity.x *= -1;
+      velocity.x *= -0.5;
     } else if (location.x < 0) {
-      velocity.x *= -1;
+      velocity.x *= -0.5;
       location.x = 0;
     }
-    println (location.y);
     if (location.y > height) {
       velocity.y *= -1;
       location.y = height;
