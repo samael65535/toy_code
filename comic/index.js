@@ -25,6 +25,7 @@ function kumakichi(maxPage, outPath) {
                     var $ = cheerio.load(s.input);
                     var filename = $('a').text();
                     result[newUrl] = filename;
+                    console.log(filename);
                 }
             });
             if (page == maxPage) {
@@ -61,8 +62,8 @@ function hashida(originData, outFile) {
                     if (exists) fs.unlinkSync(outFile);
                 });
                 Object.keys(hentaiData).forEach(function(key) {
-                    console.log(key + '\t' + hentaiData[key]);
-                    fs.appendFile(outFile,  key + '\t' + hentaiData[key]);
+                    console.log(key + '\t' + hentaiData[key] + "\n");
+                    fs.appendFile(outFile,  key + '\t' + hentaiData[key] + "\n");
                 });
                 console.log('Hentai! Enjoy it!');
             }
