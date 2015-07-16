@@ -1,3 +1,4 @@
+**/.idea
 *.elc
 comic/node_modules
 comic/bin/*.txt
