@@ -1,4 +1,5 @@
 *.elc
-
+comic/node_modules
+comic/bin/*.txt
 Processing/**/output/
 Processing/libraries
