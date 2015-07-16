@@ -4,46 +4,49 @@
 //http://www.wnacg.com/download-index-aid-18457.html
 var request = require('request');
 var cheerio = require('cheerio');
-var hentaiURL = "http://www.wnacg.com/";
+var http = require('http');
 var fs = require('fs');
-function kumakichi(maxPage, outPath) {
-    // 加工一级目录
-    var page = 1;
-    var result = {};
-    for (var i = 1; i <= maxPage; i++) {
-        var url = hentaiURL + "albums-index-page-" + i + "-cate-6.html";
-        request(url, function(error, response, body){
-            var re = /photos-index-aid-[0-9]*\.html*/;
-            var k = body.split('\n');
-            k.forEach(function(str) {
-                var s = str.match(re);
-                var newUrl = s
-                    ? hentaiURL + s[0].replace('photos', 'download') :
-                    null;
+var async = require('async');
+var hentaiURL = "http://www.wnacg.com/";
+var outPath = "./output.txt";
+var maxPage = 0
+function kumakichi(i, cb) {
+    var url = hentaiURL + "albums-index-page-" + i + "-cate-6.html";
 
-                if (newUrl && !result[newUrl]) {
-                    var $ = cheerio.load(s.input);
-                    var filename = $('a').text();
-                    result[newUrl] = filename;
-                    console.log(filename);
-                }
-            });
-            if (page == maxPage) {
-                hashida(result, outPath);
-            } else {
-                page++;
+    request(url, function(error, response, body){
+        var result = {};
+        if (error) {
+            return;
+        }
+        var re = /photos-index-aid-[0-9]*\.html*/;
+        var k = body.split('\n');
+        k.forEach(function(str) {
+            var s = str.match(re);
+            var newUrl = s
+                ? hentaiURL + s[0].replace('photos', 'download') :
+                null;
+            if (newUrl && !result[newUrl]) {
+                var $ = cheerio.load(s.input);
+                var filename = $('a').text();
+                result[newUrl] = filename;
             }
         });
-    }
+        cb(null, result, i);
+    });
 }
 
-function hashida(originData, outFile) {
+function hashida(originData, page, cb) {
     // 处理二级目录
     var hentaiData = {};
     var keys = Object.keys(originData);
     var totalFileNum = keys.length;
-    keys.forEach(function(url, index) {
+
+    keys.forEach(function(url) {
         request(url, function (error, response, body) {
+            if (error) {
+                console.log(error.message);
+                return;
+            }
             var re = /down_btn*/;
             var k = body.split('\n');
             var filename = originData[url];
@@ -58,17 +61,39 @@ function hashida(originData, outFile) {
             });
             totalFileNum--;
             if (totalFileNum == 0) {
-                fs.exists(outFile, function(exists) {
-                    if (exists) fs.unlinkSync(outFile);
-                });
+                var outStr = "";
                 Object.keys(hentaiData).forEach(function(key) {
                     console.log(key + '\t' + hentaiData[key] + "\n");
-                    fs.appendFile(outFile,  key + '\t' + hentaiData[key] + "\n");
+                    outStr += key + '\t' + hentaiData[key] + "\n";
                 });
-                console.log('Hentai! Enjoy it!');
+                fs.appendFileSync(outPath, outStr);
+                cb(null,  page+1);
             }
         })
-    })
+    });
 }
 
-module.exports = kumakichi
+
+module.exports = function(maxPage, outPath) {
+    // 加工一级目录
+    maxPage = maxPage;
+    fs.exists(outPath, function(exists) {
+        if (exists) fs.unlinkSync(outPath);
+    });
+    var funcs = [function(cb) {
+        cb(null, 1)
+    }]
+    for (var i = 1; i <= maxPage; i++) {
+        funcs.push(function(n ,cb) {
+            kumakichi(n, cb)
+        });
+        funcs.push(function(n, page, cb) {
+            hashida(n, page, cb)
+        });
+
+    }
+    async.waterfall(funcs, function(err,cb) {
+        if (err) return ;
+        console.log("Enjoy it! Hentai");
+    });
+};
