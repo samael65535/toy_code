@@ -11,7 +11,7 @@ var hentaiURL = "http://www.wnacg.com/";
 var outPath = "./output.txt";
 var maxPage = 0
 function kumakichi(i, cb) {
-    var url = hentaiURL + "albums-index-page-" + i + "-cate-6.html";
+    var url = hentaiURL + "albums-index-page-" + i + "-cate-9.html";
 
     request(url, function(error, response, body){
         var result = {};
