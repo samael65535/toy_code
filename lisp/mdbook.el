@@ -11,7 +11,7 @@
 	(set (make-local-variable 'book) (elt items i))
 	(insert (propertize (format "[%s]" (assoc-default 'title book)) 'face '(:foreground "SpringGreen")))
 	(insert ":")
-	(insert (propertize (format "<%s>\n" (assoc-default 'alt book)) 'face '(:foreground "DeepSkyBlue")))p
+	(insert (propertize (format "<%s>\n" (assoc-default 'alt book)) 'face '(:foreground "DeepSkyBlue")))
 	(setq i (1+ i))
 	)
   (setq buffer-read-only t)
