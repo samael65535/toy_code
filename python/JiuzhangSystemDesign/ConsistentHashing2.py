@@ -29,7 +29,6 @@ class Solution:
     # @param {int} hashcode an integer
     # @return {int} a machine id
     def getMachineIdByHashCode(self, hashcode):
-        # TODO 效率低, 可以使用分段区间的方法判断对应的machine_id
         while (True):
             if self.machines.get(hashcode) != None:
                 return self.machines[hashcode]
