@@ -7,21 +7,26 @@ class Tweet:
          # and auto fill id
 '''
 
+
 class Tweet:
     user_id = 0
     tweet_text = ""
+
     def __init__(self, user_id, tweet_text):
         # initialize your data structure here.
         self.user_id = user_id
         self.tweet_text = tweet_text
+
     @classmethod
     def create(cls, user_id, tweet_text):
         return Tweet(user_id=user_id, tweet_text=tweet_text)
+
 
 class MiniTwitter:
     tweet_data = {}
     all_tweets = []
     cur_tweet_id = -1
+
     def __init__(self):
         # initialize your data structure here.
         pass
@@ -34,7 +39,7 @@ class MiniTwitter:
         self.cur_tweet_id += 1
         tweet = Tweet(user_id, tweet_text);
         tweet.tweet_id = self.cur_tweet_id
-        if self.tweet_data.get(user_id) == None:
+        if self.tweet_data.get(user_id) is None:
             data = {}
             data["follow"] = {}
             data["tweets"] = []
@@ -43,20 +48,17 @@ class MiniTwitter:
         self.all_tweets.append(tweet)
         return tweet
 
-
     # @param {int} user_id
     # return {Tweet[]} 10 new feeds recently
     # and sort by timeline
     def getNewsFeed(self, user_id):
-        if self.tweet_data.get(user_id) == None:
-            data = {}
-            data["tweets"] = []
-            data["follow"] = {}
+        if self.tweet_data.get(user_id) is None:
+            data = {"tweets": [], "follow": {}}
             self.tweet_data[user_id] = data
         arr = self.tweet_data[user_id]['tweets'][-10:][::-1]
         ret = []
         for k, v in self.tweet_data[user_id]['follow'].items():
-            if (v == True and self.tweet_data.get(k) != None):
+            if v is True and self.tweet_data.get(k) is not None:
                 arr.extend(self.tweet_data[k]['tweets'][-10:][::-1])
 
         r = sorted(arr, reverse=True)[:10:]
@@ -64,15 +66,12 @@ class MiniTwitter:
             ret.append(self.all_tweets[t])
         return ret
 
-
     # @param {int} user_id
     # return {Tweet[]} 10 new posts recently
     # and sort by timeline
     def getTimeline(self, user_id):
-        if self.tweet_data.get(user_id) == None:
-            data = {}
-            data["tweets"] = []
-            data["follow"] = {}
+        if self.tweet_data.get(user_id) is None:
+            data = {"tweets": [], "follow": {}}
             self.tweet_data[user_id] = data
         arr = self.tweet_data[user_id]['tweets'][-10:][::-1]
         ret = []
@@ -80,30 +79,25 @@ class MiniTwitter:
             ret.append(self.all_tweets[t])
         return ret
 
-
     # @param {int} from user_id
     # @param {int} to_user_id
     # from user_id follows to_user_id
     def follow(self, from_user_id, to_user_id):
-        if self.tweet_data.get(from_user_id) == None:
-            data = {}
-            data["tweets"] = []
-            data["follow"] = {}
+        if self.tweet_data.get(from_user_id) is None:
+            data = {"tweets": [], "follow": {}}
             self.tweet_data[from_user_id] = data
         self.tweet_data[from_user_id]["follow"][to_user_id] = True
-
-
 
     # @param {int} from user_id
     # @param {int} to_user_id
     # from user_id unfollows to_user_id
     def unfollow(self, from_user_id, to_user_id):
-        if self.tweet_data.get(from_user_id) == None:
-            data = {}
-            data["tweets"] = []
-            data["follow"] = {}
+        if self.tweet_data.get(from_user_id) is None:
+            data = {"tweets": [], "follow": {}}
             self.tweet_data[from_user_id] = data
         self.tweet_data[from_user_id]["follow"][to_user_id] = False
+
+
 if __name__ == "__main__":
     mt = MiniTwitter()
     mt.getNewsFeed(3)
@@ -180,4 +174,3 @@ if __name__ == "__main__":
     mt.getNewsFeed(2)
     mt.getTimeline(1)
     mt.getNewsFeed(12)
-
