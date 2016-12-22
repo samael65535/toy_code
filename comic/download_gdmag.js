@@ -12,7 +12,7 @@ var app = function() {
 		var $ = cheerio.load(body)
 		var data = $("[href$='.pdf']");
 		for (var prop in data) {
-			var attribs = data[prop].attribs
+			var attribs = data[prop].attribs;
 			if (attribs && attribs.href) {
 				fileList.unshift(attribs.href);
 			}
@@ -20,17 +20,25 @@ var app = function() {
 
 		var data = $("[href$='.zip']");
 		for (var prop in data) {
-			var attribs = data[prop].attribs
+			var attribs = data[prop].attribs;
 			if (attribs && attribs.href) {
 				fileList.unshift(attribs.href);
 			}
 		}
-		console.log(fileList.join('\n'));
+
 		fs.writeFile("gdmag.txt", fileList.join('\n'),(err) => {
 			if (err) throw err;
-			console.log("OK!")
 		});
-		var wget = cp.exec("wget -i gdmag.txt -P " + outPath,  (err, stdout, stderr) => {
+
+		var downloadList = [];
+		for (var idx in fileList) {
+			var file = fileList[idx].split('/').pop();
+			if (fs.existsSync(outPath + file) == false) {
+				downloadList.push(fileList[idx].replace(new RegExp(' ', 'g'), '%20'));
+			}
+		}
+		console.log(downloadList.join(' '))
+		var wget = cp.exec("wget " + downloadList.join(' ') + " -P " + outPath,  {maxBuffer: 1024*500}, (err, stdout, stderr) => {
 			if (err) throw err;
 
 		});
@@ -38,4 +46,5 @@ var app = function() {
 	});
 
 };
+
 app()
