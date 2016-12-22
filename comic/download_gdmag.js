@@ -27,7 +27,6 @@ var app = function() {
 			}
 		}
 		console.log(fileList.join('\n'));
-		if (fs.isFile)
 		fs.writeFile("gdmag.txt", fileList.join('\n'),(err) => {
 			if (err) throw err;
 			console.log("OK!")
