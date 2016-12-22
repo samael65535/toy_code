@@ -1,4 +1,4 @@
-./gdmag/http://twvideo01.ubm-us.net/o1/vault/GD_Mag_Archives/prmier94.zip
+http://twvideo01.ubm-us.net/o1/vault/GD_Mag_Archives/prmier94.zip
 http://twvideo01.ubm-us.net/o1/vault/GD_Mag_Archives/jun94.zip
 http://twvideo01.ubm-us.net/o1/vault/GD_Mag_Archives/sep94.zip
 http://twvideo01.ubm-us.net/o1/vault/GD_Mag_Archives/dec94.zip
