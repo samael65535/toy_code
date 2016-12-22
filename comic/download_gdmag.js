@@ -15,7 +15,6 @@ var app = function() {
 			var attribs = data[prop].attribs
 			if (attribs && attribs.href) {
 				fileList.unshift(attribs.href);
-
 			}
 		}
 
@@ -39,6 +38,4 @@ var app = function() {
 	});
 
 };
-
-
 app()
