@@ -1,0 +1,83 @@
+package model
+
+import (
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+	"log"
+	"time"
+)
+
+type XBPage struct {
+	URL  string
+	Date time.Time
+}
+type XBInfo struct {
+	ID       bson.ObjectId `bson:"_id,omitempty"`
+	URL      string
+	Title    string
+	Info     string
+	Pan      string
+	LastTime time.Time
+}
+
+var session *mgo.Session
+var connect *mgo.Collection
+
+func InitDB() error {
+	var err error
+	session, err = mgo.Dial("127.0.0.1")
+	if err != nil {
+		return err
+	}
+
+	session.SetMode(mgo.Monotonic, true)
+	connect = session.DB("xiaoba").C("Items")
+	return nil
+}
+
+func CloseDB() {
+	if session != nil {
+		session.Close()
+	}
+}
+
+func New(title, url string) XBInfo {
+	xb := XBInfo{
+		Title: title,
+		URL:   url,
+	}
+	return xb
+}
+
+func (xb *XBInfo) SetInfo(info string) {
+	xb.Info = info
+	xb.LastTime = time.Now()
+}
+
+func (xb XBInfo) Save() {
+	colQuerier := bson.M{"URL": xb.URL}
+	change := mgo.Change{
+		Update:    bson.M{"$set": bson.M{"Pan": xb.Pan, "URL": xb.URL, "LastTime": xb.LastTime, "Info": xb.Info, "Title": xb.Title}},
+		ReturnNew: false,
+		Upsert:    true,
+	}
+	_, err := connect.Find(colQuerier).Apply(change, nil)
+
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (xb XBInfo) CheckExist() bool {
+	result := XBInfo{}
+	colQuerier := bson.M{"URL": xb.URL}
+	err := connect.Find(colQuerier).One(&result)
+	if err == mgo.ErrNotFound {
+		return false
+
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+	return true
+}

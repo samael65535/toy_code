@@ -1,10 +1,11 @@
-var ai = 3.92
-var aj = 1.343
-console.log(ai, aj)
-var cost = 10
+var ai = 1.429
+var aj = 3.332
+var cost = 10;
 for (var i = 1;  i <= cost; i++) {
-	j = cost - i
+for (var j = 1; j <= cost; j++) {
 	var cj = aj*j - i - j
 	var ci = ai*i - j - i
 	console.log(i, j, ci, cj)
+
+}
 }
