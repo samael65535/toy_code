@@ -9,7 +9,7 @@ func init() {
 	for r := 0; r < 62; r++ {
 		if r >= 0 && r <= 9 {
 			b = byte(r + 48)
-		} else if r >= 10 && r <= 36 {
+		} else if r >= 10 && r < 36 {
 			b = byte(r + 65 - 10)
 		} else {
 			b = byte(r + 97 - 36)
