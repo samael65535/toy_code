@@ -21,7 +21,7 @@ type XBInfo struct {
 }
 
 var session *mgo.Session
-var connect *mgo.Collection
+var collection *mgo.Collection
 
 func InitDB() error {
 	var err error
@@ -31,7 +31,7 @@ func InitDB() error {
 	}
 
 	session.SetMode(mgo.Monotonic, true)
-	connect = session.DB("xiaoba").C("Items")
+	collection = session.DB("xiaoba").C("Items")
 	return nil
 }
 
@@ -61,7 +61,7 @@ func (xb XBInfo) Save() {
 		ReturnNew: false,
 		Upsert:    true,
 	}
-	_, err := connect.Find(colQuerier).Apply(change, nil)
+	_, err := collection.Find(colQuerier).Apply(change, nil)
 
 	if err != nil {
 		panic(err)
@@ -71,7 +71,7 @@ func (xb XBInfo) Save() {
 func (xb XBInfo) CheckExist() bool {
 	result := XBInfo{}
 	colQuerier := bson.M{"URL": xb.URL}
-	err := connect.Find(colQuerier).One(&result)
+	err := collection.Find(colQuerier).One(&result)
 	if err == mgo.ErrNotFound {
 		return false
 

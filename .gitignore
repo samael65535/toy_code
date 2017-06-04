@@ -2,5 +2,5 @@
 *.elc
 Processing/**/output/
 Processing/libraries
-Golang/tinyurl/bin
-Golang/tinyurl/pkg
+Golang/**/bin
+Golang/**/pkg
