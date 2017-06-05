@@ -1,50 +1,86 @@
 package models
 
 import (
+	"github.com/muesli/cache2go"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
-var session *mgo.Session
-var collection *mgo.Collection
+var globalSession *mgo.Session
+var cache1 *cache2go.CacheTable
+var cache2 *cache2go.CacheTable
 
-func InitDB() error {
-	var err error
-	session, err = mgo.Dial("127.0.0.1")
-	if err != nil {
-		return err
+func init() {
+	cache1 = cache2go.Cache("Origin")
+	cache2 = cache2go.Cache("Shorten")
+	collection := GetSession().DB("tinyurl").C("url")
+	res := []URLModel{}
+	collection.Find(bson.M{}).All(&res)
+	for _, item := range res {
+		cache1.Add(item.Origin, 60*time.Second, &item)
+		cache2.Add(item.Shorten, 60*time.Second, &item)
 	}
-
-	session.SetMode(mgo.Monotonic, true)
-	collection = session.DB("tinyurl").C("url")
-	return nil
 }
 
-func CloseDB() {
-	if session != nil {
-		session.Close()
+func GetSession() *mgo.Session {
+	var err error
+	if globalSession == nil {
+		globalSession, err = mgo.Dial("127.0.0.1")
+		if err != nil {
+			panic(err)
+		}
+
+		globalSession.SetMode(mgo.Monotonic, true)
+	}
+	return globalSession
+}
+
+func CloseSession() {
+	if globalSession != nil {
+		globalSession.Close()
 	}
 }
 
 func SaveDB(m *URLModel) error {
+	collection := GetSession().DB("tinyurl").C("url")
 	err := collection.Insert(m)
+	cache1.Add(m.Origin, 60*time.Second, m)
+	cache2.Add(m.Shorten, 60*time.Second, m)
 	return err
-
 }
+
 func FindWithOrigin(origin string) (*URLModel, error) {
-	u := &URLModel{}
-	err := collection.Find(bson.M{"Origin": origin}).One(u)
-	if err != nil {
-		return nil, err
+
+	res, err := cache1.Value(origin)
+	if err == nil {
+		return res.Data().(*URLModel), nil
+	} else {
+		collection := GetSession().DB("tinyurl").C("url")
+		u := &URLModel{}
+		err := collection.Find(bson.M{"origin": origin}).One(u)
+		if err != nil {
+			return nil, err
+		}
+		cache1.Add(u.Origin, 60*time.Second, u)
+		cache2.Add(u.Shorten, 60*time.Second, u)
+		return u, nil
 	}
-	return u, nil
 }
 
 func FindWithShorten(shorten string) (*URLModel, error) {
-	u := &URLModel{}
-	err := collection.Find(bson.M{"shorten": shorten}).One(u)
-	if err != nil {
-		return nil, err
+	res, err := cache2.Value(shorten)
+	if err == nil {
+		return res.Data().(*URLModel), nil
+	} else {
+		collection := GetSession().DB("tinyurl").C("url")
+		u := &URLModel{}
+		err := collection.Find(bson.M{"shorten": shorten}).One(u)
+		if err != nil {
+			return nil, err
+		}
+		cache1.Add(u.Origin, 60*time.Second, u)
+		cache2.Add(u.Shorten, 60*time.Second, u)
+		return u, nil
 	}
-	return u, nil
 }

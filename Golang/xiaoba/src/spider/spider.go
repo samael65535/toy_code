@@ -3,12 +3,12 @@ package spider
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"sync"
 	"xiaoba/model"
-	"io"
 )
 
 var pageChan chan int
@@ -41,13 +41,8 @@ func init() {
 }
 
 func Run(isUpdate bool) {
-	err := model.InitDB()
-	defer model.CloseDB()
+	defer model.CloseSession()
 
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
 	log.Println("Starting....")
 
 	updateItemsNums = 0

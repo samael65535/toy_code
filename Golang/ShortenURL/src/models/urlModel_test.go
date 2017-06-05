@@ -2,6 +2,7 @@ package models
 
 import (
 	//"strconv"
+	"math/rand"
 	"strconv"
 	"testing"
 )
@@ -15,20 +16,22 @@ func TestAdd(t *testing.T) {
 }
 
 func BenchmarkAdd(b *testing.B) {
-	Clear()
 	for i := 0; i < b.N; i++ {
-		Add(strconv.FormatInt(int64(i), 10))
+		//Add(strconv.FormatUint(rand.Uint64(), 10))
+		Add(strconv.FormatUint(uint64(i), 10))
 	}
 }
 
 func BenchmarkGoAdd(b *testing.B) {
-	Clear()
 	for i := 0; i < b.N; i++ {
-		go Add(strconv.FormatInt(int64(i), 10))
+		//go Add(strconv.FormatUint(rand.Uint64(), 10))
+		go Add(strconv.FormatUint(uint64(i), 10))
 
 	}
 }
 
 func TestDBAdd(t *testing.T) {
-
+	for i := 0; i < 1000; i++ {
+		Add(strconv.FormatUint(rand.Uint64(), 10))
+	}
 }

@@ -20,24 +20,24 @@ type XBInfo struct {
 	LastTime time.Time
 }
 
-var session *mgo.Session
+var globalSession *mgo.Session
 var collection *mgo.Collection
 
-func InitDB() error {
+func getSession() error {
 	var err error
-	session, err = mgo.Dial("127.0.0.1")
+	globalSession, err = mgo.Dial("127.0.0.1")
 	if err != nil {
 		return err
 	}
 
-	session.SetMode(mgo.Monotonic, true)
-	collection = session.DB("xiaoba").C("Items")
+	globalSession.SetMode(mgo.Monotonic, true)
+	collection = globalSession.DB("xiaoba").C("Items")
 	return nil
 }
 
 func CloseDB() {
-	if session != nil {
-		session.Close()
+	if globalSession != nil {
+		globalSession.Close()
 	}
 }
 
