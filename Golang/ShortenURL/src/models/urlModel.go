@@ -39,6 +39,7 @@ type URLModel struct {
 	ID      bson.ObjectId `bson:"_id,omitempty"`
 	Shorten string
 	Origin  string
+	Count   uint
 }
 
 var urlPool *URLPool
@@ -68,6 +69,7 @@ func Add(origin string) string {
 		u := &URLModel{
 			Shorten: shorten,
 			Origin:  origin,
+			Count: 0,
 		}
 		SaveDB(u)
 	}

@@ -44,7 +44,10 @@ func CloseSession() {
 
 func SaveDB(m *URLModel) error {
 	collection := GetSession().DB("tinyurl").C("url")
-	err := collection.Insert(m)
+	_, err := collection.Upsert(map[string]string{"shorten": m.Shorten}, m)
+	if err != nil {
+		panic(err)
+	}
 	cache1.Add(m.Origin, 60*time.Second, m)
 	cache2.Add(m.Shorten, 60*time.Second, m)
 	return err
@@ -71,7 +74,10 @@ func FindWithOrigin(origin string) (*URLModel, error) {
 func FindWithShorten(shorten string) (*URLModel, error) {
 	res, err := cache2.Value(shorten)
 	if err == nil {
-		return res.Data().(*URLModel), nil
+		u := res.Data().(*URLModel)
+		u.Count += 1
+		SaveDB(u)
+		return u, nil
 	} else {
 		collection := GetSession().DB("tinyurl").C("url")
 		u := &URLModel{}
