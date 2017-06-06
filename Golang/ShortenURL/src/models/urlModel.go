@@ -10,31 +10,27 @@ import (
 )
 
 type URLPool struct {
-	pool chan string
-	mu   sync.Mutex
+	pool  chan string
+	ready chan struct{}
+	mu    sync.Mutex
 }
 
 func (u *URLPool) get() string {
 	for {
+		u.ready <- struct{}{}
 		shorten := <-u.pool
-		_, e := FindWithShorten(shorten)
-		if e == nil {
-			continue
-		}
-
 		return shorten
 	}
 }
 
 func (u *URLPool) update() {
 	for {
+		<-u.ready
 		shorten := num62.Encode(uint(rand.Uint32()))
-		// 读锁
 		_, err := FindWithShorten(shorten)
 		if err != nil {
 			u.pool <- shorten
 		}
-
 	}
 
 }
@@ -52,7 +48,7 @@ const poollimit = 20
 func init() {
 	urlPool = new(URLPool)
 	urlPool.pool = make(chan string, poollimit)
-
+	urlPool.ready = make(chan struct{})
 	go urlPool.update()
 }
 

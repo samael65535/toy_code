@@ -15,23 +15,26 @@ func TestAdd(t *testing.T) {
 	}
 }
 
+func TestDBAdd(t *testing.T) {
+	for i := 0; i < 1000; i++ {
+		Add(strconv.FormatUint(rand.Uint64(), 10))
+	}
+}
+
 func BenchmarkAdd(b *testing.B) {
+	// too slow
 	for i := 0; i < b.N; i++ {
-		//Add(strconv.FormatUint(rand.Uint64(), 10))
-		Add(strconv.FormatUint(uint64(i), 10))
+		shorten := Add(strconv.FormatInt(rand.Int63n(500), 10))
+		Get(shorten)
 	}
 }
 
 func BenchmarkGoAdd(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		//go Add(strconv.FormatUint(rand.Uint64(), 10))
-		go Add(strconv.FormatUint(uint64(i), 10))
+		go func() {
+			shorten := Add(strconv.FormatInt(rand.Int63n(500), 10))
+			Get(shorten)
+		}()
 
-	}
-}
-
-func TestDBAdd(t *testing.T) {
-	for i := 0; i < 1000; i++ {
-		Add(strconv.FormatUint(rand.Uint64(), 10))
 	}
 }
