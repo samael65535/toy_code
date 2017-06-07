@@ -25,7 +25,7 @@ func (u *URLPool) get() string {
 
 func (u *URLPool) update() {
 	for {
-		<-u.ready
+		<-u.ready // 防止空转
 		shorten := num62.Encode(uint(rand.Uint32()))
 		_, err := FindWithShorten(shorten)
 		if err != nil {
@@ -69,7 +69,7 @@ func Add(origin string) string {
 		u := &URLModel{
 			Shorten: shorten,
 			Origin:  origin,
-			Count: 0,
+			Count:   0,
 		}
 		SaveDB(u)
 	}
